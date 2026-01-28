@@ -24,6 +24,7 @@ class PlayerController extends ChangeNotifier {
 
   Artist? get artist => _artist;
   SortMode get currentSortMode => _currentSortMode;
+  List<Release> get allReleases => _allReleases;
   
   Brano? get currentBrano => _currentIndex != -1 ? _playQueue[_currentIndex].brano : null;
   Release? get currentRelease => _currentIndex != -1 ? _playQueue[_currentIndex].release : null;

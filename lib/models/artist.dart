@@ -55,9 +55,11 @@ class Artist {
 
   String get imageUrl {
     if (imgPx.isNotEmpty) {
-      return 'https://app.wipstaf.net/storage/uploads/artisti/$img';
+      if (imgPx.startsWith('http')) return imgPx;
+      return 'https://app.wipstaf.net/storage/uploads/artisti/$imgPx';
     }
     if (img.isNotEmpty) {
+      if (img.startsWith('http')) return img;
       return 'https://app.wipstaf.net/storage/$img';
     }
     return '';

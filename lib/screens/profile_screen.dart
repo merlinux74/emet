@@ -34,9 +34,15 @@ class ProfileScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: artist!.imageUrl,
+                  Image.asset(
+                    'assets/images/immagineprofilo.jpeg',
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return CachedNetworkImage(
+                        imageUrl: artist!.imageUrl,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                   const DecoratedBox(
                     decoration: BoxDecoration(

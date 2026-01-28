@@ -38,27 +38,13 @@ class _HomeScreenState extends State<HomeScreen> {
           animation: PlayerController(),
           builder: (context, _) {
             final artistName = PlayerController().artist?.name ?? 'HEMET';
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  artistName.toUpperCase(),
-                  style: GoogleFonts.ruslanDisplay(
-                    color: Colors.white,
-                    fontSize: 22,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                Text(
-                  'RAP CRISTIANO',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF6C63FF),
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 4.0,
-                  ),
-                ),
-              ],
+            return Text(
+              artistName.toUpperCase(),
+              style: GoogleFonts.ruslanDisplay(
+                color: Colors.white,
+                fontSize: 22,
+                letterSpacing: 1.2,
+              ),
             );
           },
         ),
@@ -106,12 +92,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
           final releases = snapshot.data!;
           
-          // Imposta i dati nel controller globale se disponibili
+          // Imposta i dati nel controller globale solo se non sono già stati impostati
+          // per evitare loop di rebuild infiniti
           WidgetsBinding.instance.addPostFrameCallback((_) {
             final player = PlayerController();
-            player.setAllReleases(releases);
-            if (releases.isNotEmpty && releases.first.artist != null) {
-              player.setArtist(releases.first.artist!);
+            if (player.allReleases.isEmpty) {
+              player.setAllReleases(releases);
+              if (releases.isNotEmpty && releases.first.artist != null) {
+                player.setArtist(releases.first.artist!);
+              }
             }
           });
 

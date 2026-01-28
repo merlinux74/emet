@@ -59,18 +59,14 @@ class Release {
   }
 
   String get imageUrl {
-    // Priorità a imgpx con il percorso fornito dall'utente
     if (imgpx.isNotEmpty) {
       if (imgpx.startsWith('http')) return imgpx;
       return 'https://app.wipstaf.net/storage/uploads/album/px/$imgpx';
     }
-    
-    // Fallback su img standard
     if (img.isNotEmpty) {
       if (img.startsWith('http')) return img;
       return 'https://app.wipstaf.net/storage/$img';
     }
-    
     return '';
   }
 }

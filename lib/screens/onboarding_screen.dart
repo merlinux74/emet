@@ -37,10 +37,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             if (firstRelease.artist != null) {
               imageUrl = firstRelease.artist!.imageUrl;
               
-              // Pre-initialize data
+              // Pre-initialize data once
               final player = PlayerController();
-              player.setAllReleases(snapshot.data!);
-              player.setArtist(firstRelease.artist!);
+              if (player.allReleases.isEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  player.setAllReleases(snapshot.data!);
+                  player.setArtist(firstRelease.artist!);
+                });
+              }
             }
           }
 
@@ -111,20 +115,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           fontSize: 72,
                           fontWeight: FontWeight.w400,
                           letterSpacing: 4,
-                        ),
                       ),
-                      const SizedBox(height: 8),
-                      // Subtitle
-                      Text(
-                        'RAP CRISTIANO',
-                        style: GoogleFonts.poppins(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                      const Spacer(),
+                    ),
+                    const Spacer(),
                       
                       // Gradient "Get Start" Button
                       Container(
