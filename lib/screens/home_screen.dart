@@ -34,25 +34,35 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {},
-        ),
-        title: Text(
-          'MUSIC PLAYER',
-          style: GoogleFonts.ruslanDisplay(
-            color: Colors.white,
-            fontSize: 22,
-            letterSpacing: 1.2,
-          ),
+        title: AnimatedBuilder(
+          animation: PlayerController(),
+          builder: (context, _) {
+            final artistName = PlayerController().artist?.name ?? 'HEMET';
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  artistName.toUpperCase(),
+                  style: GoogleFonts.ruslanDisplay(
+                    color: Colors.white,
+                    fontSize: 22,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                Text(
+                  'RAP CRISTIANO',
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF6C63FF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4.0,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: FutureBuilder<List<Release>>(
         future: _releasesFuture,
@@ -96,12 +106,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
           final releases = snapshot.data!;
           
-          // Imposta l'artista nel controller globale se disponibile
-          if (releases.isNotEmpty && releases.first.artist != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              PlayerController().setArtist(releases.first.artist!);
-            });
-          }
+          // Imposta i dati nel controller globale se disponibili
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final player = PlayerController();
+            player.setAllReleases(releases);
+            if (releases.isNotEmpty && releases.first.artist != null) {
+              player.setArtist(releases.first.artist!);
+            }
+          });
 
           final featuredRelease = releases.first;
 
@@ -175,27 +187,82 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 const SizedBox(height: 32),
 
-                // Recommendation Section
+                // Tracks Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: _buildSectionHeader('RECOMMENDATION'),
+                  child: _buildSectionHeader('TRACKS'),
                 ),
                 const SizedBox(height: 16),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  itemCount: releases.length,
-                  itemBuilder: (context, index) {
-                    return _buildRecommendationTile(context, releases[index]);
-                  },
-                ),
+                _buildTracksList(releases),
                 const SizedBox(height: 20),
               ],
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildTracksList(List<Release> releases) {
+    final List<Map<String, dynamic>> allTracks = [];
+    for (var release in releases) {
+      for (var brano in release.brani) {
+        allTracks.add({
+          'brano': brano,
+          'release': release,
+        });
+      }
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      itemCount: allTracks.length,
+      itemBuilder: (context, index) {
+        final item = allTracks[index];
+        final Brano brano = item['brano'];
+        final Release release = item['release'];
+        
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1B1A23),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: CachedNetworkImage(
+                imageUrl: release.imageUrl,
+                width: 48,
+                height: 48,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(color: Colors.white10),
+                errorWidget: (context, url, error) => const Icon(Icons.music_note, color: Colors.white38),
+              ),
+            ),
+            title: Text(
+              brano.titolo,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: Text(
+              '${release.nome} • Emet',
+              style: GoogleFonts.poppins(
+                color: Colors.white54,
+                fontSize: 12,
+              ),
+            ),
+            trailing: const Icon(Icons.play_circle_fill, color: Color(0xFF6C63FF), size: 32),
+            onTap: () => _openPlayer(context, brano, release),
+          ),
+        );
+      },
     );
   }
 
@@ -218,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 140,
         margin: const EdgeInsets.only(right: 16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -236,6 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
               release.nome,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 color: Colors.white,
                 fontSize: 14,

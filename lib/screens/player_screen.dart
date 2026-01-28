@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../models/release.dart';
+import '../services/player_controller.dart';
 
 class PlayerScreen extends StatefulWidget {
   final Brano brano;
@@ -21,11 +22,23 @@ class PlayerScreen extends StatefulWidget {
 
 class _PlayerScreenState extends State<PlayerScreen> {
   late YoutubePlayerController _controller;
+  final PlayerController _playerController = PlayerController();
 
   @override
   void initState() {
     super.initState();
     _initController();
+    _playerController.addListener(_onPlayerStateChanged);
+  }
+
+  void _onPlayerStateChanged() {
+    if (mounted) {
+      final currentBrano = _playerController.currentBrano;
+      if (currentBrano != null && currentBrano.youtubeId != null) {
+        _controller.load(currentBrano.youtubeId!);
+      }
+      setState(() {});
+    }
   }
 
   void _initController() {
@@ -53,12 +66,26 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    _playerController.removeListener(_onPlayerStateChanged);
     _controller.dispose();
     super.dispose();
   }
 
+  void _togglePlayPause() {
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+    } else {
+      _controller.play();
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final brano = _playerController.currentBrano ?? widget.brano;
+    final release = _playerController.currentRelease ?? widget.release;
+    final sortMode = _playerController.currentSortMode;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F0E17),
       appBar: AppBar(
@@ -81,9 +108,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onPressed: () {},
+          PopupMenuButton<SortMode>(
+            icon: const Icon(Icons.sort, color: Colors.white),
+            onSelected: (mode) => _playerController.setSortMode(mode),
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: SortMode.newest, child: Text('Più nuovi')),
+              const PopupMenuItem(value: SortMode.alphabetical, child: Text('A-Z')),
+              const PopupMenuItem(value: SortMode.random, child: Text('Random')),
+            ],
           ),
         ],
       ),
@@ -92,7 +124,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
           children: [
             const SizedBox(height: 20),
             
-            // YouTube Player Container with custom styling
+            // YouTube Player Container
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
@@ -111,10 +143,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   controller: _controller,
                   showVideoProgressIndicator: true,
                   progressIndicatorColor: const Color(0xFF6C63FF),
-                  progressColors: const ProgressBarColors(
-                    playedColor: Color(0xFF6C63FF),
-                    handleColor: Color(0xFF6C63FF),
-                  ),
+                  onReady: () => setState(() {}),
+                  onEnded: (meta) => _playerController.playNext(),
                 ),
               ),
             ),
@@ -127,17 +157,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
               child: Column(
                 children: [
                   Text(
-                    widget.brano.titolo,
+                    brano.titolo,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Emet • ${widget.release.nome}',
+                    'Emet • ${release.nome}',
                     style: GoogleFonts.poppins(
                       color: Colors.white54,
                       fontSize: 16,
@@ -149,43 +179,64 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
             const SizedBox(height: 40),
 
-            // Controls (Custom UI to match "Now Play" in image)
+            // Controls
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
                 children: [
-                  // Progress Bar (Placeholder for now, YouTube player has its own but we can add one for UI)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('00:00', style: GoogleFonts.poppins(color: Colors.white38, fontSize: 12)),
-                      Text('03:45', style: GoogleFonts.poppins(color: Colors.white38, fontSize: 12)),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      const Icon(Icons.repeat, color: Colors.white38),
-                      const Icon(Icons.skip_previous_rounded, color: Colors.white, size: 40),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF6C63FF),
-                          shape: BoxShape.circle,
+                      IconButton(
+                        icon: Icon(
+                          Icons.repeat, 
+                          color: sortMode == SortMode.newest ? const Color(0xFF6C63FF) : Colors.white38
                         ),
-                        child: const Icon(Icons.pause_rounded, color: Colors.white, size: 40),
+                        onPressed: () => _playerController.setSortMode(SortMode.newest),
                       ),
-                      const Icon(Icons.skip_next_rounded, color: Colors.white, size: 40),
-                      const Icon(Icons.shuffle, color: Colors.white38),
+                      IconButton(
+                        icon: const Icon(Icons.skip_previous_rounded, color: Colors.white, size: 40),
+                        onPressed: () => _playerController.playPrevious(),
+                      ),
+                      GestureDetector(
+                        onTap: _togglePlayPause,
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF6C63FF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            _controller.value.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, 
+                            color: Colors.white, 
+                            size: 40
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.skip_next_rounded, color: Colors.white, size: 40),
+                        onPressed: () => _playerController.playNext(),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.shuffle, 
+                          color: sortMode == SortMode.random ? const Color(0xFF6C63FF) : Colors.white38
+                        ),
+                        onPressed: () => _playerController.setSortMode(SortMode.random),
+                      ),
                     ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Sort Indicator
+                  Text(
+                    'MODALITÀ: ${sortMode == SortMode.newest ? "CRONOLOGICO" : sortMode == SortMode.alphabetical ? "ALFABETICO" : "RANDOM"}',
+                    style: GoogleFonts.poppins(color: Colors.white24, fontSize: 10, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             
-            const SizedBox(height: 50),
+            const SizedBox(height: 40),
             
             // Lyrics hint
             Column(
