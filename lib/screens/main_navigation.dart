@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'player_screen.dart';
+import 'profile_screen.dart';
 import '../services/player_controller.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -27,6 +28,9 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   void _onPlayerChanged() {
+    // Re-build navigation to update ProfileScreen when artist is loaded
+    setState(() {});
+    
     if (_playerController.hasTrack && _selectedIndex != 1) {
       setState(() {
         _selectedIndex = 1; // Passa automaticamente al tab player quando un brano viene selezionato
@@ -48,7 +52,9 @@ class _MainNavigationState extends State<MainNavigation> {
                 isTab: true,
               )
             : const PlayerPlaceholder(),
-          const ProfilePlaceholder(),
+          _playerController.artist != null 
+            ? ProfileScreen(artist: _playerController.artist!)
+            : const Center(child: CircularProgressIndicator()),
         ],
       ),
       bottomNavigationBar: Container(
@@ -101,20 +107,6 @@ class PlayerPlaceholder extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ProfilePlaceholder extends StatelessWidget {
-  const ProfilePlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0F0E17),
-      body: Center(
-        child: Text('Profilo (Coming Soon)', style: TextStyle(color: Colors.white38)),
       ),
     );
   }

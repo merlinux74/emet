@@ -1,9 +1,12 @@
+import 'artist.dart';
+
 class Release {
   final int id;
   final String nome;
   final String img;
   final String imgpx;
   final List<Brano> brani;
+  final Artist? artist;
 
   Release({
     required this.id,
@@ -11,6 +14,7 @@ class Release {
     required this.img,
     required this.imgpx,
     required this.brani,
+    this.artist,
   });
 
   factory Release.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,14 @@ class Release {
         }
       }
     }
+
+    Artist? artist;
+    if (json['releaseuser'] != null && (json['releaseuser'] as List).isNotEmpty) {
+      var releaseUser = json['releaseuser'][0];
+      if (releaseUser['user2'] != null && (releaseUser['user2'] as List).isNotEmpty) {
+        artist = Artist.fromJson(releaseUser['user2'][0]);
+      }
+    }
     
     return Release(
       id: json['id'],
@@ -42,6 +54,7 @@ class Release {
       img: json['img'] ?? '',
       imgpx: json['imgpx'] ?? '',
       brani: braniList,
+      artist: artist,
     );
   }
 

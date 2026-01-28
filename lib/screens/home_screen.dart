@@ -95,6 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           final releases = snapshot.data!;
+          
+          // Imposta l'artista nel controller globale se disponibile
+          if (releases.isNotEmpty && releases.first.artist != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              PlayerController().setArtist(releases.first.artist!);
+            });
+          }
+
           final featuredRelease = releases.first;
 
           return SingleChildScrollView(
