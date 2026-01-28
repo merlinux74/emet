@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../models/artist.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -154,10 +155,16 @@ class ProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      if (artist!.instagram != null) _buildSocialIcon(Icons.camera_alt, artist!.instagram!),
-                      if (artist!.youtube != null) _buildSocialIcon(Icons.play_circle_filled, artist!.youtube!),
-                      if (artist!.spotify != null) _buildSocialIcon(Icons.music_note, artist!.spotify!),
-                      if (artist!.tiktok != null) _buildSocialIcon(Icons.video_library, artist!.tiktok!),
+                      if (artist!.instagram != null && artist!.instagram!.isNotEmpty) 
+                        _buildSocialIcon(FontAwesomeIcons.instagram, artist!.instagram!),
+                      if (artist!.youtube != null && artist!.youtube!.isNotEmpty) 
+                        _buildSocialIcon(FontAwesomeIcons.youtube, artist!.youtube!),
+                      if (artist!.spotify != null && artist!.spotify!.isNotEmpty) 
+                        _buildSocialIcon(FontAwesomeIcons.spotify, artist!.spotify!),
+                      if (artist!.tiktok != null && artist!.tiktok!.isNotEmpty) 
+                        _buildSocialIcon(FontAwesomeIcons.tiktok, artist!.tiktok!),
+                      if (artist!.appleMusic != null && artist!.appleMusic!.isNotEmpty) 
+                        _buildSocialIcon(FontAwesomeIcons.apple, artist!.appleMusic!),
                     ],
                   ),
                   const SizedBox(height: 50),
@@ -185,7 +192,7 @@ class ProfileScreen extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white10),
         ),
-        child: Icon(icon, color: Colors.white, size: 28),
+        child: FaIcon(icon, color: Colors.white, size: 28),
       ),
     );
   }
