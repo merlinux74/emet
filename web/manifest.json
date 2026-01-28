@@ -1,12 +1,12 @@
 {
-    "name": "emet",
-    "short_name": "emet",
+    "name": "EMET Space",
+    "short_name": "EMET",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#FFFFFF",
+    "theme_color": "#007BFF",
+    "description": "EMET - Il tuo spazio di musica e worship.",
+    "orientation": "portrait",
     "prefer_related_applications": false,
     "icons": [
         {
