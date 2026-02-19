@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../models/release.dart';
 import '../services/api_service.dart';
 import '../services/player_controller.dart';
+import '../services/theme_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,8 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0E17),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -41,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
             return Text(
               artistName.toUpperCase(),
               style: GoogleFonts.ruslanDisplay(
-                color: Colors.white,
+                color: isDark ? Colors.white : Colors.black,
                 fontSize: 22,
                 letterSpacing: 1.2,
               ),
@@ -49,12 +52,21 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              isDark ? Icons.light_mode : Icons.dark_mode,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+            onPressed: () => ThemeController().toggleTheme(),
+          ),
+        ],
       ),
       body: FutureBuilder<List<Release>>(
         future: _releasesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)));
+            return Center(child: CircularProgressIndicator(color: theme.primaryColor));
           } else if (snapshot.hasError) {
             return Center(
               child: Column(
@@ -64,12 +76,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 16),
                   Text('Errore nel caricamento: ${snapshot.error}', 
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white70)),
+                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: _retryFetch,
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6C63FF)),
-                    child: const Text('Riprova'),
+                    style: ElevatedButton.styleFrom(backgroundColor: theme.primaryColor),
+                    child: Text('Riprova', style: TextStyle(color: isDark ? Colors.white : Colors.white)),
                   ),
                 ],
               ),
@@ -79,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Nessuna release trovata', style: TextStyle(color: Colors.white70)),
+                  Text('Nessuna release trovata', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _retryFetch,
@@ -193,6 +205,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTracksList(List<Release> releases) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     final List<Map<String, dynamic>> allTracks = [];
     for (var release in releases) {
       for (var brano in release.brani) {
@@ -216,8 +231,15 @@ class _HomeScreenState extends State<HomeScreen> {
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF1B1A23),
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: isDark ? null : [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -229,13 +251,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 48,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(color: Colors.white10),
-                errorWidget: (context, url, error) => const Icon(Icons.music_note, color: Colors.white38),
+                errorWidget: (context, url, error) => Icon(Icons.music_note, color: isDark ? Colors.white38 : Colors.black26),
               ),
             ),
             title: Text(
               brano.titolo,
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
@@ -243,11 +265,11 @@ class _HomeScreenState extends State<HomeScreen> {
             subtitle: Text(
               '${release.nome} • Emet',
               style: GoogleFonts.poppins(
-                color: Colors.white54,
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
                 fontSize: 12,
               ),
             ),
-            trailing: const Icon(Icons.play_circle_fill, color: Color(0xFF6C63FF), size: 32),
+            trailing: Icon(Icons.play_circle_fill, color: theme.primaryColor, size: 32),
             onTap: () => _openPlayer(context, brano, release),
           ),
         );
@@ -256,10 +278,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildSectionHeader(String title) {
+    final theme = Theme.of(context);
     return Text(
       title,
       style: GoogleFonts.poppins(
-        color: Colors.white70,
+        color: theme.colorScheme.onSurface.withOpacity(0.7),
         fontSize: 14,
         fontWeight: FontWeight.bold,
         letterSpacing: 1.2,
@@ -268,6 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecentCard(BuildContext context, Release release) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => _openPlayer(context, release.brani.first, release),
       child: Container(
@@ -294,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -306,11 +330,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRecommendationTile(BuildContext context, Release release) {
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1A23),
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
@@ -327,19 +352,19 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           release.nome,
           style: GoogleFonts.poppins(
-            color: Colors.white,
-            fontSize: 16,
+            color: theme.colorScheme.onSurface,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
-          'Emet • 2025',
+          'Emet',
           style: GoogleFonts.poppins(
-            color: Colors.white54,
+            color: theme.colorScheme.onSurface.withOpacity(0.5),
             fontSize: 12,
           ),
         ),
-        trailing: const Icon(Icons.favorite_border, color: Color(0xFF6C63FF)),
+        trailing: Icon(Icons.favorite_border, color: theme.primaryColor),
         onTap: () => _openPlayer(context, release.brani.first, release),
       ),
     );

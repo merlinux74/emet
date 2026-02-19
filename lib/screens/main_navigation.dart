@@ -40,6 +40,9 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -54,14 +57,21 @@ class _MainNavigationState extends State<MainNavigation> {
             : const PlayerPlaceholder(),
           _playerController.artist != null 
             ? ProfileScreen(artist: _playerController.artist!)
-            : const Center(child: CircularProgressIndicator()),
+            : Center(child: CircularProgressIndicator(color: theme.primaryColor)),
         ],
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: const BoxDecoration(
-          color: Color(0xFF0F0E17),
-          border: Border(top: BorderSide(color: Colors.white10, width: 0.5)),
+        decoration: BoxDecoration(
+          color: theme.scaffoldBackgroundColor,
+          border: Border(top: BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.05), width: 0.5)),
+          boxShadow: isDark ? null : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
@@ -74,8 +84,8 @@ class _MainNavigationState extends State<MainNavigation> {
           elevation: 0,
           showSelectedLabels: false,
           showUnselectedLabels: false,
-          selectedItemColor: const Color(0xFF6C63FF),
-          unselectedItemColor: Colors.white38,
+          selectedItemColor: theme.primaryColor,
+          unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.3),
           type: BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
@@ -93,17 +103,17 @@ class PlayerPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF0F0E17),
+    final theme = Theme.of(context);
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.music_note, size: 64, color: Colors.white10),
-            SizedBox(height: 16),
+            Icon(Icons.music_note, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.05)),
+            const SizedBox(height: 16),
             Text(
               'Seleziona un brano per iniziare',
-              style: TextStyle(color: Colors.white38),
+              style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.3)),
             ),
           ],
         ),

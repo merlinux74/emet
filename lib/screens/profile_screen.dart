@@ -12,17 +12,18 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (artist == null) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF0F0E17),
+      return Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+          child: CircularProgressIndicator(color: theme.primaryColor),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0E17),
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -30,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 400,
             pinned: true,
-            backgroundColor: const Color(0xFF0F0E17),
+            backgroundColor: theme.scaffoldBackgroundColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
@@ -45,16 +46,16 @@ class ProfileScreen extends StatelessWidget {
                       );
                     },
                   ),
-                  const DecoratedBox(
+                  DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Color(0xFF0F0E17),
+                          theme.scaffoldBackgroundColor,
                         ],
-                        stops: [0.6, 1.0],
+                        stops: const [0.6, 1.0],
                       ),
                     ),
                   ),
@@ -74,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     artist!.name,
                     style: GoogleFonts.poppins(
-                      color: Colors.white,
+                      color: theme.colorScheme.onSurface,
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                     ),
@@ -82,7 +83,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     '${artist!.genere} • ${artist!.etichetta}',
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF6C63FF),
+                      color: theme.primaryColor,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -95,19 +96,26 @@ class ProfileScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1B1A23),
+                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF6C63FF).withOpacity(0.3)),
+                        border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
+                        boxShadow: isDark ? null : [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.auto_stories, color: Color(0xFF6C63FF)),
+                          Icon(Icons.auto_stories, color: theme.primaryColor),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Text(
                               artist!.versoBibbia!,
                               style: GoogleFonts.poppins(
-                                color: Colors.white70,
+                                color: theme.colorScheme.onSurface.withOpacity(0.7),
                                 fontSize: 14,
                                 fontStyle: FontStyle.italic,
                               ),
@@ -123,7 +131,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     'BIOGRAFIA',
                     style: GoogleFonts.poppins(
-                      color: Colors.white70,
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
@@ -133,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     artist!.biografia,
                     style: GoogleFonts.poppins(
-                      color: Colors.white54,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 15,
                       height: 1.6,
                     ),
@@ -145,7 +153,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     'SOCIAL',
                     style: GoogleFonts.poppins(
-                      color: Colors.white70,
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.5,
@@ -156,15 +164,15 @@ class ProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       if (artist!.instagram != null && artist!.instagram!.isNotEmpty) 
-                        _buildSocialIcon(FontAwesomeIcons.instagram, artist!.instagram!),
+                        _buildSocialIcon(context, FontAwesomeIcons.instagram, artist!.instagram!),
                       if (artist!.youtube != null && artist!.youtube!.isNotEmpty) 
-                        _buildSocialIcon(FontAwesomeIcons.youtube, artist!.youtube!),
+                        _buildSocialIcon(context, FontAwesomeIcons.youtube, artist!.youtube!),
                       if (artist!.spotify != null && artist!.spotify!.isNotEmpty) 
-                        _buildSocialIcon(FontAwesomeIcons.spotify, artist!.spotify!),
+                        _buildSocialIcon(context, FontAwesomeIcons.spotify, artist!.spotify!),
                       if (artist!.tiktok != null && artist!.tiktok!.isNotEmpty) 
-                        _buildSocialIcon(FontAwesomeIcons.tiktok, artist!.tiktok!),
+                        _buildSocialIcon(context, FontAwesomeIcons.tiktok, artist!.tiktok!),
                       if (artist!.appleMusic != null && artist!.appleMusic!.isNotEmpty) 
-                        _buildSocialIcon(FontAwesomeIcons.apple, artist!.appleMusic!),
+                        _buildSocialIcon(context, FontAwesomeIcons.apple, artist!.appleMusic!),
                     ],
                   ),
                   const SizedBox(height: 50),
@@ -177,7 +185,10 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, String url) {
+  Widget _buildSocialIcon(BuildContext context, IconData icon, String url) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () async {
         final uri = Uri.parse(url);
@@ -188,11 +199,18 @@ class ProfileScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1B1A23),
+          color: theme.colorScheme.surface,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.1)),
+          boxShadow: isDark ? null : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        child: FaIcon(icon, color: Colors.white, size: 28),
+        child: FaIcon(icon, color: theme.colorScheme.onSurface, size: 28),
       ),
     );
   }

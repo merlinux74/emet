@@ -25,8 +25,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0E17),
       body: FutureBuilder<List<Release>>(
         future: _dataFuture,
         builder: (context, snapshot) {
@@ -50,16 +52,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           return Stack(
             children: [
-              // Background with purple glow
+              // Background with glow
               Positioned.fill(
                 child: Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      center: Alignment(0, -0.2),
+                      center: const Alignment(0, -0.2),
                       radius: 1.2,
-                      colors: [
-                        Color(0xFF2D1B4E),
-                        Color(0xFF0F0E17),
+                      colors: isDark ? [
+                        const Color(0xFF2D1B4E),
+                        const Color(0xFF0F0E17),
+                      ] : [
+                        const Color(0xFFE3F2FD),
+                        Colors.white,
                       ],
                     ),
                   ),
@@ -74,14 +79,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 height: MediaQuery.of(context).size.height * 0.75,
                 child: ShaderMask(
                   shaderCallback: (rect) {
-                    return const LinearGradient(
+                    return LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.transparent, Colors.black],
-                      stops: [0.0, 0.4],
+                      colors: [Colors.transparent, isDark ? Colors.black : Colors.white],
+                      stops: const [0.0, 0.4],
                     ).createShader(rect);
                   },
-                  blendMode: BlendMode.dstIn,
+                  blendMode: isDark ? BlendMode.dstIn : BlendMode.dstOut,
                   child: Image.asset(
                     'assets/images/imgstart.png',
                     fit: BoxFit.cover,
@@ -111,7 +116,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Text(
                         'Emet',
                         style: GoogleFonts.ruslanDisplay(
-                          color: Colors.white,
+                          color: isDark ? Colors.white : theme.primaryColor,
                           fontSize: 72,
                           fontWeight: FontWeight.w400,
                           letterSpacing: 4,
@@ -125,16 +130,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 54,
                         margin: const EdgeInsets.only(bottom: 50),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF6C63FF),
-                              Color(0xFF3B2667),
+                          gradient: LinearGradient(
+                            colors: isDark ? [
+                              const Color(0xFF6C63FF),
+                              const Color(0xFF3B2667),
+                            ] : [
+                              const Color(0xFF00D2FF),
+                              const Color(0xFF007BFF),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(27),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6C63FF).withOpacity(0.3),
+                              color: theme.primaryColor.withOpacity(0.3),
                               blurRadius: 15,
                               offset: const Offset(0, 8),
                             ),
@@ -172,9 +180,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               if (snapshot.connectionState == ConnectionState.waiting)
                 Positioned.fill(
                   child: Container(
-                    color: const Color(0xFF0F0E17).withOpacity(0.5),
-                    child: const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+                    color: theme.scaffoldBackgroundColor.withOpacity(0.5),
+                    child: Center(
+                      child: CircularProgressIndicator(color: theme.primaryColor),
                     ),
                   ),
                 ),
