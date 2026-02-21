@@ -67,7 +67,7 @@ flutter:
 
   assets:
     - assets/images/imgstart.png
-    - assets/images/immagineprofilo.jpeg
+    - assets/images/immagineprofilo.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
