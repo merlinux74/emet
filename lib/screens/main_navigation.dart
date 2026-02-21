@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'player_screen.dart';
 import 'profile_screen.dart';
+import 'privacy_screen.dart';
 import '../services/player_controller.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -58,6 +59,7 @@ class _MainNavigationState extends State<MainNavigation> {
           _playerController.artist != null 
             ? ProfileScreen(artist: _playerController.artist!)
             : Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+          const PrivacyScreen(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -91,6 +93,7 @@ class _MainNavigationState extends State<MainNavigation> {
             BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
             BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Player'),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(icon: Icon(Icons.privacy_tip_outlined), label: 'Privacy'),
           ],
         ),
       ),
