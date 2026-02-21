@@ -45,6 +45,10 @@ dependencies:
   shared_preferences: ^2.2.0
   new_version_plus: ^0.0.9
 
+dependency_overrides:
+  package_info_plus: 4.2.0
+  path_provider_foundation: 2.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

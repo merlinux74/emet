@@ -86,8 +86,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _checkVersion() async {
     final newVersion = NewVersionPlus(
-      androidId: 'com.emet.musika', // Sostituire con il vero package name
-      iOSId: 'com.emet.musika', // Sostituire con il vero bundle ID
+      androidId: 'it.stereotype.emet', // Sostituire con il vero package name
+      iOSId: 'it.stereotype.emet', // Sostituire con il vero bundle ID
     );
 
     try {

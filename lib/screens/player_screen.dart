@@ -31,6 +31,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
     _playerController.addListener(_onPlayerStateChanged);
   }
 
+  void _onYoutubePlayerChange() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _onPlayerStateChanged() {
     if (mounted) {
       final currentBrano = _playerController.currentBrano;
@@ -53,7 +59,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         forceHD: false,
         enableCaption: true,
       ),
-    );
+    )..addListener(_onYoutubePlayerChange);
   }
 
   @override
@@ -67,6 +73,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void dispose() {
     _playerController.removeListener(_onPlayerStateChanged);
+    _controller.removeListener(_onYoutubePlayerChange);
     _controller.dispose();
     super.dispose();
   }
