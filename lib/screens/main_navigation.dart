@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'home_screen.dart';
 import 'player_screen.dart';
 import 'profile_screen.dart';
@@ -77,10 +78,17 @@ class _MainNavigationState extends State<MainNavigation> {
         ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
+          onTap: (index) async {
+            if (index == 4) {
+              final uri = Uri.parse('https://app.wipstaf.net/download');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            } else {
+              setState(() {
+                _selectedIndex = index;
+              });
+            }
           },
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -89,11 +97,22 @@ class _MainNavigationState extends State<MainNavigation> {
           selectedItemColor: theme.primaryColor,
           unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.3),
           type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Player'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-            BottomNavigationBarItem(icon: Icon(Icons.privacy_tip_outlined), label: 'Privacy'),
+          items: [
+            const BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+            const BottomNavigationBarItem(icon: Icon(Icons.music_note), label: 'Player'),
+            const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            const BottomNavigationBarItem(icon: Icon(Icons.privacy_tip_outlined), label: 'Privacy'),
+            BottomNavigationBarItem(
+              icon: SizedBox(
+                width: 24,
+                height: 24,
+                child: Image.asset(
+                  'assets/images/wipstaf.png',
+                  color: _selectedIndex == 4 ? theme.primaryColor : theme.colorScheme.onSurface.withOpacity(0.3),
+                ),
+              ),
+              label: 'Wipstaf',
+            ),
           ],
         ),
       ),

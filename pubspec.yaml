@@ -42,6 +42,8 @@ dependencies:
   cached_network_image: ^3.4.1
   intl: ^0.20.2
   font_awesome_flutter: ^10.12.0
+  shared_preferences: ^2.2.0
+  new_version_plus: ^0.0.9
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +55,15 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/emet-icon.png"
+  macos:
+    generate: true
+    image_path: "assets/images/emet-icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,6 +79,7 @@ flutter:
   assets:
     - assets/images/imgstart.png
     - assets/images/immagineprofilo.png
+    - assets/images/wipstaf.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
