@@ -169,6 +169,7 @@ class ProfileScreen extends StatelessWidget {
                         _buildSocialIcon(context, FontAwesomeIcons.youtube, artist!.youtube!),
                       if (artist!.spotify != null && artist!.spotify!.isNotEmpty) 
                         _buildSocialIcon(context, FontAwesomeIcons.spotify, artist!.spotify!),
+                      _buildWipstafIcon(context),
                       if (artist!.tiktok != null && artist!.tiktok!.isNotEmpty) 
                         _buildSocialIcon(context, FontAwesomeIcons.tiktok, artist!.tiktok!),
                       if (artist!.appleMusic != null && artist!.appleMusic!.isNotEmpty) 
@@ -211,6 +212,43 @@ class ProfileScreen extends StatelessWidget {
           ],
         ),
         child: FaIcon(icon, color: theme.colorScheme.onSurface, size: 28),
+      ),
+    );
+  }
+
+  Widget _buildWipstafIcon(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () async {
+        final uri = Uri.parse('https://app.wipstaf.net/download');
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.1)),
+          boxShadow: isDark ? null : [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          width: 28,
+          height: 28,
+          child: Image.asset(
+            'assets/images/wipstaf.png',
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
       ),
     );
   }
