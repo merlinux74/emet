@@ -222,7 +222,7 @@ class ProfileScreen extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
-        final uri = Uri.parse('https://app.wipstaf.net/download');
+        final uri = Uri.parse('https://app.wipstaf.net/artisti/302');
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         }
